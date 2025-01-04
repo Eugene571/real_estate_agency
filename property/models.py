@@ -52,5 +52,13 @@ class Flat(models.Model):
         blank=True,
         db_index=True)
 
+    def save(self, *args, **kwargs):
+        # Устанавливаем new_building = True, если год постройки больше 2014
+        if self.construction_year and self.construction_year > 2014:
+            self.new_building = True
+        else:
+            self.new_building = False
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f'{self.town}, {self.address} ({self.price}р.)'
