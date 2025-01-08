@@ -14,7 +14,7 @@ class Flat(models.Model):
     price = models.IntegerField('Цена квартиры', db_index=True)
 
     town = models.CharField(
-        'Город, где находится квартира',
+        'Город',
         max_length=50,
         db_index=True)
     town_district = models.CharField(
