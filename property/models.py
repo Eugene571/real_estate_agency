@@ -1,11 +1,13 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Flat(models.Model):
     owner = models.CharField('ФИО владельца', max_length=200)
     owners_phonenumber = models.CharField('Номер владельца', max_length=20)
+    owner_pure_phone = PhoneNumberField('Форматированный номер владельца', blank=True, null=True)
     created_at = models.DateTimeField(
         'Когда создано объявление',
         default=timezone.now,
@@ -52,9 +54,9 @@ class Flat(models.Model):
         null=True,
         blank=True,
         db_index=True)
+    likes = models.ManyToManyField(User, related_name='liked_flats', blank=True)
 
     def save(self, *args, **kwargs):
-        # Устанавливаем new_building = True, если год постройки больше 2014
         if self.construction_year and self.construction_year > 2014:
             self.new_building = True
         else:
@@ -74,3 +76,13 @@ class Complaint(models.Model):
 
     def __str__(self):
         return f'Жалоба от {self.user.username} на {self.flat.address}'
+
+
+# class Owner(models.Model):
+#     name = models.CharField('ФИО', max_length=200)
+#     phone_number = models.CharField('Номер телефона', max_length=20, blank=True, null=True)
+#     normalized_phone = PhoneNumberField('Нормализованный номер телефона', blank=True, null=True)
+#     flats = models.ManyToManyField('property.Flat', related_name='owners_list', blank=True)
+#
+#     def __str__(self):
+#         return self.name
