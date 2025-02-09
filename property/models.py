@@ -5,6 +5,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Flat(models.Model):
+    id = models.AutoField(primary_key=True)
     created_at = models.DateTimeField(
         'Когда создано объявление',
         default=timezone.now,
@@ -43,8 +44,9 @@ class Flat(models.Model):
         blank=True,
         db_index=True)
 
-    has_balcony = models.NullBooleanField(
+    has_balcony = models.BooleanField(
         'Наличие балкона',
+        null=True,
         db_index=True)
     active = models.BooleanField(
         'Активно-ли объявление',
@@ -79,6 +81,7 @@ class Flat(models.Model):
 
 
 class Complaint(models.Model):
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -101,6 +104,7 @@ class Complaint(models.Model):
 
 
 class Owner(models.Model):
+    id = models.AutoField(primary_key=True)
     owner = models.CharField(
         "ФИО владельца",
         max_length=200,
