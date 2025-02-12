@@ -65,7 +65,7 @@ class Flat(models.Model):
         User,
         blank=True,
         verbose_name='Кто лайкнул',
-        related_name='liked_users',
+        related_name='who_liked',
         db_index=True)
 
     def save(self, *args, **kwargs):
@@ -105,19 +105,19 @@ class Complaint(models.Model):
 
 class Owner(models.Model):
     id = models.AutoField(primary_key=True)
-    owner = models.CharField(
+    fio = models.CharField(
         "ФИО владельца",
         max_length=200,
         db_index=True)
-    owners_phonenumber = models.CharField(
+    phonenum = models.CharField(
         "Номер владельца",
         max_length=20,
         db_index=True)
-    owner_phone_pure = PhoneNumberField(
+    phonenum_pure = PhoneNumberField(
         "Нормализованный номер владельца",
         blank=True,
         db_index=True)
-    owned_property = models.ManyToManyField(
+    property = models.ManyToManyField(
         Flat,
         blank=True,
         verbose_name='Квартиры в собственности',
