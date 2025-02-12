@@ -13,7 +13,7 @@ def fill_owner_card(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('property', '0012_auto_20250204_2107'),
+        ('property', '0011_auto_20250204_2104'),
     ]
 
     operations = [
