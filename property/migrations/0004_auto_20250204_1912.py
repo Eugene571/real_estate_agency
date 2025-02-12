@@ -5,15 +5,13 @@ from ..models import Flat
 
 
 def update_new_building(apps, schema_editor):
-    Flat = apps.get_model("property", "Flat")  # Получаем модель через ORM миграции
+    Flat = apps.get_model("property", "Flat")
 
-    for flat in Flat.objects.all():  # Проходимся по всем объектам Flat
-        if flat.construction_year and flat.construction_year > 2014:
-            flat.new_building = True
-        else:
-            flat.new_building = False
+    # Обновляем все квартиры, построенные после 2014 года
+    Flat.objects.filter(construction_year__gt=2014).update(new_building=True)
 
-        flat.save()  # Сохраняем изменения для каждого объекта
+    # Обновляем остальные квартиры
+    Flat.objects.exclude(construction_year__gt=2014).update(new_building=False)
 
 
 class Migration(migrations.Migration):
