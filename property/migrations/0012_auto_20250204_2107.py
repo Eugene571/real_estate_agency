@@ -13,6 +13,11 @@ def add_flat_to_owner(apps, schema_editor):
 
 def reverse_adding(apps, schema_editor):
     Owner = apps.get_model('property', 'Owner')
+    Owner.objects.all().update(flat=None)
+
+
+def reverse_adding(apps, schema_editor):
+    Owner = apps.get_model('property', 'Owner')
     for owner in Owner.objects.all():
         owner.flat = ''
 

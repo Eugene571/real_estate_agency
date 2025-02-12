@@ -6,14 +6,31 @@ from django.db import migrations
 def fill_owner_card(apps, schema_editor):
     Flat = apps.get_model('property', 'Flat')
     Owner = apps.get_model('property', 'Owner')
-    for flat in Flat.objects.all():
-        Owner.objects.get_or_create(owner=flat.owner, owners_phonenumber=flat.owners_phonenumber, owner_phone_pure=flat.owner_pure_phone)
+
+    # Получаем данные из моделей Flat
+    flat_data = list(Flat.objects.values('owner', 'owners_phonenumber', 'owner_pure_phone'))
+
+    # Готовим массив для массовой вставки
+    owners_to_create = []
+    for data in flat_data:
+        owner, created = Owner.objects.get_or_create(
+            owner=data['owner'],
+            defaults={
+                'owners_phonenumber': data['owners_phonenumber'],
+                'owner_phone_pure': data['owner_pure_phone']
+            }
+        )
+        if not created:
+            continue
+        owners_to_create.append(Owner(**data))
+
+    # Массовая вставка владельцев
+    Owner.objects.bulk_create(owners_to_create)
 
 
 def reverse_filling(apps, schema_editor):
     Owner = apps.get_model('property', 'Owner')
-    for owner in Owner.objects.all():
-        owner.delete()
+    Owner.objects.all().delete()
 
 
 class Migration(migrations.Migration):

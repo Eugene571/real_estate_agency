@@ -2,28 +2,31 @@
 
 from django.db import migrations
 import phonenumbers
+from django.db.models import Value, CharField, Case, When, F
+from phonenumbers import parse as parse_phone, is_valid_number, format_number, NumberParseException
 
 
 def normalize_phone_numbers(apps, schema_editor):
     Flat = apps.get_model('property', 'Flat')
-    flats = Flat.objects.all()
-    for flat in flats:
+
+    def format_or_none(phone_number):
         try:
-            # Парсим номер
-            parsed_number = phonenumbers.parse(flat.owners_phonenumber, "RU")
-            if phonenumbers.is_valid_number(parsed_number):
-                # Если номер валиден, форматируем в E164
-                formatted_phone = phonenumbers.format_number(
-                    parsed_number, phonenumbers.PhoneNumberFormat.E164
-                )
+            parsed_number = parse_phone(phone_number, "RU")
+            if is_valid_number(parsed_number):
+                return format_number(parsed_number, phonenumbers.PhoneNumberFormat.E164)
             else:
-                # Если номер невалиден
-                formatted_phone = None
-        except phonenumbers.NumberParseException:
-            # Если номер не удалось разобрать
-            formatted_phone = None
-        # Обновляем только поле owner_pure_phone
-        Flat.objects.filter(id=flat.id).update(owner_pure_phone=formatted_phone)
+                return None
+        except NumberParseException:
+            return None
+
+    # Обновляем все объекты за один запрос
+    Flat.objects.annotate(
+        formatted_phone=Case(
+            When(owners_phonenumber__isnull=False, then=Value(format_or_none(F('owners_phonenumber')))),
+            default=None,
+            output_field=CharField()
+        )
+    ).update(owner_pure_phone=F('formatted_phone'))
 
 
 class Migration(migrations.Migration):
