@@ -14,8 +14,6 @@ def normalize_phone_numbers(apps, schema_editor):
             parsed_number = parse_phone(phone_number, "RU")
             if is_valid_number(parsed_number):
                 return format_number(parsed_number, phonenumbers.PhoneNumberFormat.E164)
-            else:
-                return None
         except NumberParseException:
             return None
 
