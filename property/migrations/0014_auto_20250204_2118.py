@@ -21,7 +21,7 @@ def add_flat_to_owner(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('property', '0013_auto_20250204_2114'),
+        ('property', '0011_auto_20250204_2104'),
     ]
 
     operations = [
