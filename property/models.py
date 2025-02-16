@@ -114,7 +114,7 @@ class Owner(models.Model):
         "Нормализованный номер владельца",
         blank=True,
         db_index=True)
-    property = models.ManyToManyField(
+    properties = models.ManyToManyField(
         Flat,
         blank=True,
         verbose_name='Квартиры в собственности',
