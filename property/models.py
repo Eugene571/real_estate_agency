@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from phonenumber_field.modelfields import PhoneNumberField
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 
 class Flat(models.Model):
@@ -67,16 +69,16 @@ class Flat(models.Model):
         related_name='who_liked',
         db_index=True)
 
-    def save(self, *args, **kwargs):
-        # Устанавливаем new_building = True, если год постройки больше 2014
-        if self.construction_year and self.construction_year > 2014:
-            self.new_building = True
-        else:
-            self.new_building = False
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return f'{self.town}, {self.address} ({self.price}р.)'
+
+
+@receiver(pre_save, sender=Flat)
+def set_new_building(sender, instance, **kwargs):
+    if instance.construction_year and instance.construction_year > 2014:
+        instance.new_building = True
+    else:
+        instance.new_building = False
 
 
 class Complaint(models.Model):
