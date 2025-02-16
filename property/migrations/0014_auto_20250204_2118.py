@@ -10,7 +10,6 @@ def add_flat_to_owner(apps, schema_editor):
     # Получаем все объекты Flat и предварительно загружаем связанных владельцев
     flats = Flat.objects.prefetch_related('owner')
 
-    # Обрабатываем объекты
     for flat in flats:
         owner, _ = Owner.objects.get_or_create(
             owner=flat.owner,

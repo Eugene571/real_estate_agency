@@ -6,8 +6,17 @@ from django.db import migrations
 def fill_owner_card(apps, schema_editor):
     Flat = apps.get_model('property', 'Flat')
     Owner = apps.get_model('property', 'Owner')
-    for flat in Flat.objects.all():
-        Owner.objects.get_or_create(owner=flat.owner, owners_phonenumber=flat.owners_phonenumber, owner_phone_pure=flat.owner_pure_phone)
+
+    # Получаем все объекты Flat и предварительно загружаем связанных владельцев
+    flats = Flat.objects.prefetch_related('owner')
+
+    # Обрабатываем объекты
+    for flat in flats:
+        owner, _ = Owner.objects.get_or_create(
+            owner=flat.owner,
+            defaults={'owners_phonenumber': flat.owners_phonenumber, 'owner_phone_pure': flat.owner_pure_phone}
+        )
+        owner.owned_property.add(flat)
 
 
 class Migration(migrations.Migration):
